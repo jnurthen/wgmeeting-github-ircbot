@@ -364,8 +364,8 @@ fn handle_bot_command(
             );
             send_line(
                 None,
-                "I separate discussions by the \"Topic:\" lines, and I know what github issues to \
-                 use only by lines of the form \"GitHub: <url> | none\".",
+                "I separate discussions by the \"Topic:\", \"Subtopic:\", or \"Agenda:\" lines, \
+                 and I know what github issues to use only by lines of the form \"GitHub: <url> | none\".",
             );
             if response_target.starts_with('#') {
                 send_line(
@@ -748,6 +748,9 @@ impl ChannelData {
                 } else if let Some(ref subtopic) = strip_ci_prefix(&line.message, "subtopic:") {
                     // Treat subtopic: the same as topic:, at least for now.
                     self.start_topic(irc, subtopic);
+                } else if let Some(ref agenda) = strip_ci_prefix(&line.message, "agenda:") {
+                    // Treat agenda: the same as topic:, at least for now.
+                    self.start_topic(irc, agenda);
                 }
             }
             true => {

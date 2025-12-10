@@ -22,7 +22,7 @@ think.   Though ScribeNick should probably be doable quickly...)
 
 # How to use
 
-Begin a topic on IRC:
+Begin a topic on IRC (you can use "Topic:", "Subtopic:", or "Agenda:"):
 
 ```
 Topic: [name of topic]
@@ -43,7 +43,7 @@ Add the resolutions:
 RESOLVED: frob the snozwuzzle breadth-first
 ```
 
-Either begin a new topic:
+Either begin a new topic (using "Topic:", "Subtopic:", or "Agenda:"):
 
 ```
 Topic: Semantics of the gribble
@@ -61,7 +61,7 @@ At this point, the github-bot responds:
 * github-bot Successfully commented on [URL of the GitHub issue]
 ```
 
-The comments that github-bot adds are everything since the last Topic was begun, even if that was before the `github: [URL]` was entered.
+The comments that github-bot adds are everything since the last Topic/Subtopic/Agenda was begun, even if that was before the `github: [URL]` was entered.
 
 # Development notes
 
