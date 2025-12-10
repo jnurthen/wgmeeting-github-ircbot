@@ -748,6 +748,9 @@ impl ChannelData {
                 } else if let Some(ref subtopic) = strip_ci_prefix(&line.message, "subtopic:") {
                     // Treat subtopic: the same as topic:, at least for now.
                     self.start_topic(irc, subtopic);
+                } else if let Some(ref agenda) = strip_ci_prefix(&line.message, "agenda:") {
+                    // Treat agenda: the same as topic:, at least for now.
+                    self.start_topic(irc, agenda);
                 }
             }
             true => {
