@@ -364,8 +364,8 @@ fn handle_bot_command(
             );
             send_line(
                 None,
-                "I separate discussions by the \"Topic:\" lines, and I know what github issues to \
-                 use only by lines of the form \"GitHub: <url> | none\".",
+                "I separate discussions by the \"Topic:\", \"Subtopic:\", or \"Agenda:\" lines, \
+                 and I know what github issues to use only by lines of the form \"GitHub: <url> | none\".",
             );
             if response_target.starts_with('#') {
                 send_line(
