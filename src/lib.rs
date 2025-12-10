@@ -875,19 +875,24 @@ impl ChannelData {
                 self.start_topic(irc, agenda);
             } else if let Some(caps) = AGENDUM_RE.captures(&line.message) {
                 // Extract and clean the title from agendum lines
-                let mut title = caps.name("title").map(|m| m.as_str().trim()).unwrap_or("").to_string();
-                
+                let mut title = caps
+                    .name("title")
+                    .map(|m| m.as_str().trim())
+                    .unwrap_or("")
+                    .to_string();
+
                 // Strip trailing ' -- ' annotations (e.g., "-- taken up [from agendabot]")
                 if let Some(idx) = title.find(" -- ") {
                     title.truncate(idx);
                 }
-                
+
                 // Drop trailing URL tokens (e.g., "https://github.com/...")
-                title = title.split_whitespace()
+                title = title
+                    .split_whitespace()
                     .take_while(|w| !w.starts_with("http://") && !w.starts_with("https://"))
                     .collect::<Vec<&str>>()
                     .join(" ");
-                
+
                 // Only start topic if we have a non-empty title after cleanup
                 if !title.trim().is_empty() {
                     self.start_topic(irc, &title);
