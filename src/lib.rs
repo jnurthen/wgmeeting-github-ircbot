@@ -857,12 +857,41 @@ impl ChannelData {
     // Returns the response that should be sent to the message over IRC.
     // FIXME: Move this to be a method on IRCState.
     fn add_line(&mut self, irc: &'static IrcClient, target: &str, line: ChannelLine) {
+        // Static regex for detecting agendum lines from IRC bots like agendabot/Zakim.
+        // Matches lines like:
+        // "agendum 2 -- -> New PR Triage https://... -- taken up [from agendabot]"
+        // "agenda: Topic Name"
+        // "agenda 1 - Topic Name"
+        static AGENDUM_RE: LazyLock<Regex> = LazyLock::new(|| {
+            Regex::new(r"(?i)^\s*agend(?:a|um)\b(?:\s*\d+)?(?:\s*(?:[-–—]+\s*)*(?:->|-&gt;)\s*|\s*[:\-]\s*|\s+)?(?P<title>.+)$").unwrap()
+        });
         if !line.is_action {
             if let Some(ref topic) = strip_ci_prefix(&line.message, "topic:") {
                 self.start_topic(irc, topic);
             } else if let Some(ref subtopic) = strip_ci_prefix(&line.message, "subtopic:") {
                 // Treat subtopic: the same as topic:, at least for now.
                 self.start_topic(irc, subtopic);
+            } else if let Some(ref agenda) = strip_ci_prefix(&line.message, "agenda:") {
+                self.start_topic(irc, agenda);
+            } else if let Some(caps) = AGENDUM_RE.captures(&line.message) {
+                // Extract and clean the title from agendum lines
+                let mut title = caps.name("title").map(|m| m.as_str().trim()).unwrap_or("").to_string();
+                
+                // Strip trailing ' -- ' annotations (e.g., "-- taken up [from agendabot]")
+                if let Some(idx) = title.find(" -- ") {
+                    title.truncate(idx);
+                }
+                
+                // Drop trailing URL tokens (e.g., "https://github.com/...")
+                title = title.split_whitespace()
+                    .take_while(|w| !w.starts_with("http://") && !w.starts_with("https://"))
+                    .collect::<Vec<&str>>()
+                    .join(" ");
+                
+                // Only start topic if we have a non-empty title after cleanup
+                if !title.trim().is_empty() {
+                    self.start_topic(irc, &title);
+                }
             }
         }
         if (line.is_action
