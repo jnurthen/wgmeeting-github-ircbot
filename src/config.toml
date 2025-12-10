@@ -5,15 +5,21 @@ alt_nicks = ["github-bot-", "github-bot--"]
 username = "dbaron-gh-bot"
 realname = "Bot to add meeting minutes to github issues."
 server = "irc.w3.org"
-port = 994
-use_ssl = true
+port = 6679
+use_tls = true
 encoding = "UTF-8"
 user_info = "Bot to add meeting minutes to github issues."
 
 [bot]
 source = "https://github.com/dbaron/wgmeeting-github-ircbot"
-github_uastring = "wgmeeting-github-ircbot/0.1.0"
 activity_timeout_minutes = 90
+owners = ["dbaron"]
+
+[channels."#cssbotprod"]
+group = "Testing of the production instance of this IRC bot."
+github_repos_allowed = [
+    "dbaron/wgmeeting-github-ircbot",
+]
 
 [channels."#css"]
 group = "CSS Working Group"
@@ -24,7 +30,11 @@ github_repos_allowed = [
     "w3c/svgwg",
     "web-platform-tests/wpt",
     "WICG/animation-worklet",
+    "WICG/construct-stylesheets",
     "WICG/scroll-animations",
+    "WICG/custom-state-pseudo-class",
+    "openui/open-ui",
+    "whatwg/html",
 ]
 
 [channels."#fx"]
@@ -36,7 +46,11 @@ github_repos_allowed = [
     "w3c/svgwg",
     "web-platform-tests/wpt",
     "WICG/animation-worklet",
+    "WICG/construct-stylesheets",
     "WICG/scroll-animations",
+    "WICG/custom-state-pseudo-class",
+    "openui/open-ui",
+    "whatwg/html",
 ]
 
 [channels."#houdini"]
@@ -48,7 +62,11 @@ github_repos_allowed = [
     "w3c/svgwg",
     "web-platform-tests/wpt",
     "WICG/animation-worklet",
+    "WICG/construct-stylesheets",
     "WICG/scroll-animations",
+    "WICG/custom-state-pseudo-class",
+    "openui/open-ui",
+    "whatwg/html",
 ]
 
 [channels."#tt"]
@@ -56,10 +74,21 @@ group = "Timed Text Working Group"
 github_repos_allowed = [
     "w3c/adpt",
     "w3c/charter-timed-text",
+    "w3c/dapt",
+    "w3c/dapt-reqs",
+    "w3c/dapt-tests",
     "w3c/imsc",
+    "w3c/imsc-hrm",
+    "w3c/imsc-hrm-tests",
     "w3c/imsc-tests",
     "w3c/imsc-vnext-reqs",
     "w3c/png-hdr-pq",
+    "w3c/tt-module-css",
+    "w3c/tt-module-karaoke",
+    "w3c/tt-module-live",
+    "w3c/tt-module-registry",
+    "w3c/tt-module-ruby-ext-1",
+    "w3c/tt-module-vr",
     "w3c/tt-profile-registry",
     "w3c/tt-reqs",
     "w3c/ttml-webvtt-mapping",
@@ -67,8 +96,13 @@ github_repos_allowed = [
     "w3c/ttml1-tests",
     "w3c/ttml2",
     "w3c/ttml2-tests",
+    "w3c/ttml3",
+    "w3c/ttml3-tests",
     "w3c/ttwg",
     "w3c/webvtt",
+    "w3c/IMSC-1.0.1_Text_TestContent",
+    "w3c/IMSC-1.1_Image_TestContent",
+    "w3c/IMSC-1.1_Text_TestContent",
 ]
 
 [channels."#pwg"]
@@ -85,6 +119,31 @@ github_repos_allowed = [
 group = "ARIA Authoring Practices (APG) Task Force"
 github_repos_allowed = [
     "w3c/aria-practices",
+    "w3c/wai-aria-practices",
+]
+
+[channels."#aria"]
+group = "ARIA Working Group"
+github_repos_allowed = [
+    "w3c/aria",
+    "w3c/aria-common",
+    "w3c/core-aam",
+    "w3c/accname",
+    "w3c/html-aam",
+]
+
+[channels."#aria-at"]
+group = "ARIA-AT Community Group"
+github_repos_allowed = [
+    "w3c/aria-at",
+    "w3c/aria-at-app",
+    "w3c/at-driver",
+]
+
+[channels."#pdf-aam"]
+group = "PDF-AAM Task Force"
+github_repos_allowed = [
+    "w3c/pdf-aam",
 ]
 
 [channels."#aria"]
@@ -124,11 +183,71 @@ github_repos_allowed = [
     "w3c/geolocation-sensor",
     "w3c/battery",
     "w3c/wake-lock",
+    "w3c/geolocation-api",
     "web-platform-tests/wpt",
 ]
 
 [channels."#w3process"]
 group = "Revising W3C Process CG"
 github_repos_allowed = [
-    "w3c/w3process",
+    "w3c/process",
+]
+
+[channels."#eo"]
+group = "Education and Outreach (EO) Working Group"
+github_repos_allowed = [
+    "w3c/wai-authoring-tools",
+    "w3c/wai-atag-report-tool",
+]
+
+[channels."#ab"]
+group = "Advisory Board"
+github_repos_allowed = [
+    "w3c/ab-memberonly",
+]
+publish_resolutions_only = true
+
+[channels."#webdriver"]
+group = "Browser Testing and Tools Working Group"
+github_repos_allowed = [
+    "w3c/at-driver",
+    "w3c/webdriver",
+    "w3c/webdriver-bidi",
+]
+
+[channels."#epub"]
+group = "EPUB 3 Working Group"
+github_repos_allowed = [
+    "w3c/epub-wg",
+    "w3c/publ-epub-revision",
+]
+
+[channels."#openui"]
+group = "Open UI Community Group"
+github_repos_allowed = [
+    "openui/open-ui",
+    "whatwg/html",
+]
+
+[channels."#editing"]
+group = "Web Editing Working Group"
+github_repos_allowed = [
+    "w3c/editing",
+    "w3c/clipboard-apis",
+    "w3c/input-events",
+    "w3c/virtual-keyboard",
+    "w3c/edit-context",
+]
+
+[channels."#matf"]
+group = "Mobile Accessibility Task Force"
+github_repos_allowed = [
+    "w3c/matf",
+]
+
+[channels."#webcomponents"]
+group = "Web Components Community Group"
+github_repos_allowed = [
+    "WICG/webcomponents",
+    "whatwg/html",
 ]

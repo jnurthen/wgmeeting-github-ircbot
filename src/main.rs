@@ -1,27 +1,25 @@
 // see 'rustc -W help'
-#![warn(missing_docs, unused_extern_crates, unused_results)]
+#![warn(
+    missing_docs,
+    unused,
+    unused_results,
+    nonstandard_style,
+    rust_2018_compatibility,
+    rust_2018_idioms
+)]
 
 //! An IRC bot that posts comments to github when W3C-style IRC minuting is
 //! combined with "Github topic:" or "Github issue:" lines that give the
 //! github issue to comment in.
 
-extern crate env_logger;
-extern crate irc;
-// We need this for derive(Deserialize).
-#[allow(unused_extern_crates)]
-extern crate serde;
-#[macro_use]
-extern crate serde_derive;
-extern crate tokio_core;
-extern crate toml;
-extern crate wgmeeting_github_ircbot;
-
-use irc::client::prelude::{Client, ClientExt, Config as IrcConfig, Future, IrcClient, Stream};
-use irc::client::PackedIrcClient;
+use anyhow::Result;
+use futures::prelude::*;
+use irc::client::prelude::{Client as IrcClient, Config as IrcConfig};
+use serde::Deserialize;
 use std::collections::HashMap;
 use std::env;
 use std::fs;
-use tokio_core::reactor::Core;
+use std::str;
 use wgmeeting_github_ircbot::*;
 
 fn read_config() -> (IrcConfig, BotConfig) {
@@ -46,38 +44,35 @@ fn read_config() -> (IrcConfig, BotConfig) {
         channels: HashMap<String, ChannelConfig>,
     }
     let file = fs::read(config_file).expect("couldn't load configuration file");
+    let file_contents = str::from_utf8(&file).expect("configuration file not UTF-8");
     let mut config: Config =
-        toml::from_slice(&file).expect("couldn't parse configuration file");
+        toml::from_str(file_contents).expect("couldn't parse configuration file");
     config.bot.github_access_token =
         fs::read_to_string(token_file).expect("couldn't read github access token file");
-    config.irc.channels = Some(config.channels.keys().cloned().collect());
+    config.irc.channels = config.channels.keys().cloned().collect();
     config.bot.channels = config.channels;
     (config.irc, config.bot)
 }
 
-fn main() {
+#[tokio::main(flavor = "current_thread")]
+async fn main() -> Result<()> {
     env_logger::init();
-    let (irc_config, bot_config): &'static (_, _) = Box::leak(Box::new(read_config()));
+    let _ = rustls::crypto::ring::default_provider().install_default();
+    let (irc_config, bot_config) = read_config();
+    let bot_config: &'static _ = Box::leak(Box::new(bot_config));
 
     // FIXME: Add a way to ask the bot to reboot itself?
 
-    let mut core = Core::new().unwrap();
-    let handle = core.handle();
-    let mut irc_state = IRCState::new(GithubType::RealGithubConnection, &handle);
+    let mut irc_state = IRCState::new(GithubType::RealGithubConnection);
 
-    let irc_client_future = IrcClient::new_future(handle, irc_config).expect(
-        "Couldn't initialize server \
-         with given configuration file",
-    );
+    let irc_client: &'static mut _ = Box::leak(Box::new(IrcClient::from_config(irc_config).await?));
+    irc_client.identify()?;
 
-    let PackedIrcClient(irc, irc_outgoing_future) = core.run(irc_client_future).unwrap();
+    let mut irc_stream = irc_client.stream()?;
 
-    irc.identify().unwrap();
+    while let Some(message) = irc_stream.next().await.transpose()? {
+        process_irc_message(irc_client, &mut irc_state, bot_config, message);
+    }
 
-    let ircstream = irc.stream().for_each(|message| {
-        process_irc_message(&irc, &mut irc_state, bot_config, message);
-        Ok(())
-    });
-
-    let _ = core.run(ircstream.join(irc_outgoing_future)).unwrap();
+    Ok(())
 }
