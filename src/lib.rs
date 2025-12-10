@@ -862,6 +862,19 @@ impl ChannelData {
         // "agendum 2 -- -> New PR Triage https://... -- taken up [from agendabot]"
         // "agenda: Topic Name"
         // "agenda 1 - Topic Name"
+        //
+        // Pattern breakdown:
+        // (?i)                                  - Case insensitive
+        // ^\s*                                  - Start of line, optional whitespace
+        // agend(?:a|um)                         - Match "agenda" or "agendum"
+        // \b                                    - Word boundary
+        // (?:\s*\d+)?                           - Optional: whitespace + digits (e.g., " 2")
+        // (?:                                   - Optional separator, one of:
+        //   \s*(?:[-–—]+\s*)*(?:->|-&gt;)\s*    -   Dashes + arrow (-> or -&gt;)
+        //   |\s*[:\-]\s*                        -   or colon/dash separator
+        //   |\s+                                -   or just whitespace
+        // )?
+        // (?P<title>.+)$                        - Capture rest of line as title
         static AGENDUM_RE: LazyLock<Regex> = LazyLock::new(|| {
             Regex::new(r"(?i)^\s*agend(?:a|um)\b(?:\s*\d+)?(?:\s*(?:[-–—]+\s*)*(?:->|-&gt;)\s*|\s*[:\-]\s*|\s+)?(?P<title>.+)$").unwrap()
         });
